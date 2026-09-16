@@ -110,6 +110,15 @@ components:
         place: copy-to
         dest: switch/Moonlight-Switch
 
+  - name: Chiaki (Akira)
+    repo: xlanor/akira
+    strip_v: true
+    assets:
+      # GUI homebrew que usa o cliente chiaki-ng para streaming remoto de PS4/PS5
+      - regex: '^akira\.nro$'
+        place: copy-to
+        dest: switch
+
   - name: EdiZon
     repo: WerWolv/EdiZon
     strip_v: true
@@ -151,6 +160,22 @@ components:
     assets:
       - regex: '^SwitchPoff\..*\.zip$'
         place: zip-merge
+
+  - name: Reboot
+    repo: metehankaygsz/reboottopayloadswitch
+    strip_v: false
+    assets:
+      - regex: '^Reboot\.nro$'
+        place: copy-to
+        dest: switch/Reboot
+
+  - name: NXThemes Installer
+    repo: exelix11/SwitchThemeInjector
+    strip_v: false
+    assets:
+      - regex: '^NXThemesInstaller\.nro$'
+        place: copy-to
+        dest: switch/NXThemesInstaller
 
 # Deliberadamente FORA da lista: instaladores de título/NSP-XCI (DBI, Tinfoil,
 # LiteFoil, NPShop, Sphaira). Na pesquisa feita pra montar esse arquivo, os
