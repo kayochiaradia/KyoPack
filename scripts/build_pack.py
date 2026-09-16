@@ -23,16 +23,18 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import json
 import os
 import re
 import sys
+import time
 import zipfile
 from datetime import date
 from pathlib import Path
 from urllib.request import Request, urlopen
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 import yaml
 
@@ -44,6 +46,11 @@ DIST_DIR = ROOT / "dist"
 
 GITHUB_API = "https://api.github.com"
 PACK_NAME = "KyoPack"
+USER_AGENT = "KyoPack-builder (+https://github.com/kayochiaradia/KyoPack)"
+REQUEST_TIMEOUT = 30
+DOWNLOAD_TIMEOUT = 120
+MAX_RETRIES = 3
+RETRY_BACKOFF = (2, 5, 10)
 
 KNOWN_ISSUES = (
     "[Problemas Conhecidos]\n\n"
@@ -52,26 +59,47 @@ KNOWN_ISSUES = (
 )
 
 
+def _with_retries(url: str, req: Request, timeout: int) -> bytes:
+    last_err: Exception | None = None
+    for attempt, delay in enumerate((0, *RETRY_BACKOFF), start=1):
+        if delay:
+            time.sleep(delay)
+        try:
+            with urlopen(req, timeout=timeout) as resp:
+                return resp.read()
+        except HTTPError as e:
+            if e.code == 403 and e.headers.get("X-RateLimit-Remaining") == "0":
+                raise RuntimeError(
+                    f"Rate limit da API do GitHub atingido ao consultar {url}. "
+                    "Defina GITHUB_TOKEN no ambiente para um limite maior."
+                ) from e
+            if e.code in (429, 500, 502, 503, 504) and attempt <= MAX_RETRIES:
+                last_err = e
+                continue
+            raise RuntimeError(f"Falha ao consultar {url}: {e.code} {e.reason}") from e
+        except URLError as e:
+            if attempt <= MAX_RETRIES:
+                last_err = e
+                continue
+            raise RuntimeError(f"Falha de rede ao consultar {url}: {e.reason}") from e
+    raise RuntimeError(f"Falha ao consultar {url} após {MAX_RETRIES} tentativas") from last_err
+
+
 def gh_request(path: str) -> dict:
     url = f"{GITHUB_API}{path}"
-    req = Request(url, headers={"Accept": "application/vnd.github+json"})
+    req = Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": USER_AGENT})
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         req.add_header("Authorization", f"Bearer {token}")
-    try:
-        with urlopen(req) as resp:
-            return json.loads(resp.read().decode())
-    except HTTPError as e:
-        raise RuntimeError(f"Falha ao consultar {url}: {e.code} {e.reason}") from e
+    return json.loads(_with_retries(url, req, REQUEST_TIMEOUT).decode())
 
 
 def download(url: str) -> bytes:
-    req = Request(url)
+    req = Request(url, headers={"User-Agent": USER_AGENT})
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         req.add_header("Authorization", f"Bearer {token}")
-    with urlopen(req) as resp:
-        return resp.read()
+    return _with_retries(url, req, DOWNLOAD_TIMEOUT)
 
 
 def pick_asset(assets: list[dict], pattern: str) -> dict:
@@ -146,6 +174,13 @@ def zip_build_dir(build_dir: Path, out_path: Path) -> None:
                 zf.write(path, path.relative_to(build_dir))
 
 
+def write_checksum(zip_path: Path) -> Path:
+    digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
+    checksum_path = zip_path.with_suffix(zip_path.suffix + ".sha256")
+    checksum_path.write_text(f"{digest}  {zip_path.name}\n", encoding="utf-8")
+    return checksum_path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--force", action="store_true", help="reconstrói mesmo sem mudanças")
@@ -194,7 +229,9 @@ def main() -> int:
     pack_version = next_pack_version(DIST_DIR)
     zip_path = DIST_DIR / f"{PACK_NAME}-{pack_version}.zip"
     zip_build_dir(BUILD_DIR, zip_path)
+    checksum_path = write_checksum(zip_path)
     print(f"Pacote gerado: {zip_path}")
+    print(f"Checksum: {checksum_path}")
 
     changelog_lines = ["[Changelog]", "", "Atualizações do Pacote.", ""]
     if updates:
@@ -217,6 +254,7 @@ def main() -> int:
             f.write("updated=true\n")
             f.write(f"pack_version={pack_version}\n")
             f.write(f"zip_path={zip_path}\n")
+            f.write(f"checksum_path={checksum_path}\n")
             f.write(f"changelog_path={changelog_path}\n")
 
     return 0

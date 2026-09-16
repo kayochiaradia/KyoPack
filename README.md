@@ -26,7 +26,8 @@ diariamente (e também pode ser disparado manualmente na aba *Actions*),
 executa o builder e, se houver atualização:
 
 1. commita o novo `state/versions.json`;
-2. cria uma *release* no GitHub com o zip anexado e um changelog no formato:
+2. cria uma *release* no GitHub com o zip e um `.sha256` (checksum de
+   integridade) anexados, e um changelog no formato:
 
    ```
    [Changelog]
