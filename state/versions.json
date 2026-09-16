@@ -1,4 +1,19 @@
 {
+  "AmiiboGenerator": "2.1.1",
   "Atmosphère": "1.11.2",
-  "hekate": "6.5.3"
+  "EdiZon": "3.1.0",
+  "Fizeau": "2.8.3",
+  "HekateToolbox": "4.0.4",
+  "JKSV": "12/02/2025",
+  "Linkalho": "2.0.2",
+  "Moonlight-Switch": "1.5.0",
+  "NX-Activity-Log": "1.4.0",
+  "NX-Region-Manager": "1.0.0",
+  "SwitchPoff": "1.1",
+  "SysDVR": "6.3",
+  "Ultrahand Overlay": "2.5.3",
+  "battery_desync_fix": "1.5.1",
+  "hekate": "6.5.3",
+  "sys-clk": "2.0.1",
+  "sys-con": "0.6.5"
 }
