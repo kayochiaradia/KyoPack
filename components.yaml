@@ -152,13 +152,6 @@ components:
       - regex: '^SwitchPoff\..*\.zip$'
         place: zip-merge
 
-  - name: NX-Region-Manager
-    repo: CostelaCNX/NX-Region-Manager
-    strip_v: false
-    assets:
-      - regex: '^nx-region-manager\.zip$'
-        place: zip-merge
-
 # Deliberadamente FORA da lista: instaladores de título/NSP-XCI (DBI, Tinfoil,
 # LiteFoil, NPShop, Sphaira). Na pesquisa feita pra montar esse arquivo, os
 # projetos e forks mais associados a esses nomes giram majoritariamente em
