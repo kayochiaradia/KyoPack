@@ -82,6 +82,11 @@ parcialmente, pela legislação da maioria dos países, e é de inteira
 responsabilidade de quem o utiliza verificar e respeitar as leis da sua
 própria jurisdição.
 
+O pacote inclui instaladores de título (DBI, Sphaira) usados para gerenciar
+backups dos seus próprios jogos — dumps feitos por você mesmo do seu próprio
+cartucho ou compra digital. Instalar arquivos de jogos que você não possui é
+pirataria e não é o uso pretendido nem suportado por este projeto.
+
 Nintendo Switch é uma marca registrada da Nintendo. Este projeto não é
 afiliado, patrocinado ou endossado pela Nintendo.
 

@@ -177,10 +177,42 @@ components:
         place: copy-to
         dest: switch/NXThemesInstaller
 
-# Deliberadamente FORA da lista: instaladores de título/NSP-XCI (DBI, Tinfoil,
-# LiteFoil, NPShop, Sphaira). Na pesquisa feita pra montar esse arquivo, os
-# projetos e forks mais associados a esses nomes giram majoritariamente em
-# torno de instalar dumps de jogos baixados (catálogos Tinfoil, coleções de
-# ROM, integração com torrent/Telegram) — não é o uso que esse pacote quer
-# habilitar. O CFW e os homebrews acima seguem cobrindo saves, cheats,
-# overclock, streaming, controles e temas sem entrar nessa categoria.
+  # Instalador de título (NSP/XCI). Incluído por pedido explícito do
+  # mantenedor, ciente de que na prática a maioria do uso desse tipo de app
+  # é pra jogos baixados, não backups próprios — ver aviso legal no README.
+  - name: DBI
+    repo: rashevskyv/dbi
+    strip_v: false
+    assets:
+      - regex: '^DBI\.nro$'
+        place: copy-to
+        dest: switch/DBI
+
+  - name: Sphaira
+    repo: ITotalJustice/sphaira
+    strip_v: false
+    assets:
+      - regex: '^sphaira\.zip$'
+        place: zip-merge
+
+  - name: NX-Region-Manager
+    repo: CostelaCNX/NX-Region-Manager
+    strip_v: false
+    assets:
+      - regex: '^nx-region-manager\.zip$'
+        place: zip-merge
+
+# Tinfoil e LiteFoil NÃO foram adicionados por impossibilidade técnica, não
+# só por política: o Tinfoil oficial é fechado e nunca foi distribuído via
+# GitHub Releases (só pelo site/Patreon do autor, sem repo público). O
+# LiteFoil (ahoyallu/LiteFoil, mapeado por outros pack builders da cena) foi
+# removido do GitHub e não existe mais em nenhum fork ativo encontrado — sem
+# repo real não tem o que apontar aqui.
+#
+# NPShop segue deliberadamente FORA por outro motivo: o próprio autor
+# descreve o ecossistema oficial (NPShop.org) como um backend ligado ao
+# Google Drive pra "gerenciamento de biblioteca de jogos" com "geração de
+# catálogo Tinfoil" — ou seja, é uma ferramenta de distribuição de catálogo
+# de jogos, não um instalador genérico como o DBI. Além disso o repo do
+# cliente (NPShopOrg/NPShopSwitch) não publica nenhuma release no GitHub, o
+# que também inviabilizaria automatizar o download por aqui.
