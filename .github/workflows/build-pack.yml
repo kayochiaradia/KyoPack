@@ -1,0 +1,59 @@
+name: Forjar pacote
+
+on:
+  schedule:
+    # todo dia às 09:00 UTC (~06:00 em Brasília)
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Forçar rebuild mesmo sem mudanças"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r scripts/requirements.txt
+
+      - name: Rodar builder
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            python scripts/build_pack.py --force
+          else
+            python scripts/build_pack.py
+          fi
+
+      - name: Commit do estado de versões
+        if: steps.build.outputs.updated == 'true'
+        run: |
+          git config user.name "forjanx-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add state/versions.json
+          git commit -m "chore: atualiza versões do pacote (${{ steps.build.outputs.pack_version }})"
+          git push
+
+      - name: Criar release
+        if: steps.build.outputs.updated == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.build.outputs.pack_version }}
+          name: "ForjaNX ${{ steps.build.outputs.pack_version }}"
+          body_path: ${{ steps.build.outputs.changelog_path }}
+          files: ${{ steps.build.outputs.zip_path }}

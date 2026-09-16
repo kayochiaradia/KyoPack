@@ -1,0 +1,33 @@
+# ForjaNX — mapa de componentes
+#
+# Cada entrada descreve UMA fonte upstream (um repositório do GitHub) e como o
+# asset da release mais recente deve ser posicionado dentro do pacote final.
+#
+# Campos:
+#   name          nome de exibição (usado no changelog)
+#   repo          "owner/repo" no GitHub
+#   asset_regex   regex (Python re.search) para escolher o asset certo entre
+#                 vários publicados na mesma release
+#   place         como colocar o arquivo baixado no pacote:
+#                   zip-merge   -> extrai o zip direto na raiz do build/
+#                   zip-to      -> extrai o zip dentro de build/<dest>
+#                   copy-to     -> copia o arquivo (sem extrair) para build/<dest>
+#   dest          caminho de destino dentro do build/ (usado por zip-to e copy-to)
+#   strip_v       remove um "v" inicial da tag antes de guardar a versão (bool)
+#
+# Para adicionar um novo componente: confirme o slug real do repositório no
+# GitHub (não adivinhe) e o nome do asset na aba Releases antes de escrever
+# o asset_regex.
+
+components:
+  - name: Atmosphère
+    repo: Atmosphere-NX/Atmosphere
+    asset_regex: '^atmosphere-.*\.zip$'
+    place: zip-merge
+    strip_v: false
+
+  - name: hekate
+    repo: CTCaer/hekate
+    asset_regex: '^hekate_ctcaer_[\d.]+_Nyx_[\d.]+\.zip$'
+    place: zip-merge
+    strip_v: true
