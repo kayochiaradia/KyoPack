@@ -43,6 +43,13 @@ executa o builder e, se houver atualização:
    Encontrou algo? Abra uma issue no repositório do KyoPack.
    ```
 
+   A seção "Problemas Conhecidos" é montada dinamicamente: o builder consulta
+   as issues abertas do próprio repositório do KyoPack com a label
+   [`known-issue`](https://github.com/kayochiaradia/KyoPack/labels/known-issue)
+   e lista o título e o link de cada uma. Sem issues com essa label, cai no
+   texto padrão acima. Pra sinalizar um problema conhecido numa release
+   futura, basta abrir/rotular a issue antes do próximo build.
+
 ## Rodando localmente
 
 ```bash

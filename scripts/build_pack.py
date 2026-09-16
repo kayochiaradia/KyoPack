@@ -52,11 +52,8 @@ DOWNLOAD_TIMEOUT = 120
 MAX_RETRIES = 3
 RETRY_BACKOFF = (2, 5, 10)
 
-KNOWN_ISSUES = (
-    "[Problemas Conhecidos]\n\n"
-    "Nenhum problema conhecido no momento.\n"
-    "Encontrou algo? Abra uma issue no repositório do KyoPack."
-)
+SELF_REPO = os.environ.get("GITHUB_REPOSITORY", "kayochiaradia/KyoPack")
+KNOWN_ISSUES_LABEL = "known-issue"
 
 
 def _with_retries(url: str, req: Request, timeout: int) -> bytes:
@@ -85,7 +82,7 @@ def _with_retries(url: str, req: Request, timeout: int) -> bytes:
     raise RuntimeError(f"Falha ao consultar {url} após {MAX_RETRIES} tentativas") from last_err
 
 
-def gh_request(path: str) -> dict:
+def gh_request(path: str) -> dict | list:
     url = f"{GITHUB_API}{path}"
     req = Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": USER_AGENT})
     token = os.environ.get("GITHUB_TOKEN")
@@ -100,6 +97,32 @@ def download(url: str) -> bytes:
     if token:
         req.add_header("Authorization", f"Bearer {token}")
     return _with_retries(url, req, DOWNLOAD_TIMEOUT)
+
+
+def known_issues_section(repo: str) -> str:
+    header = "[Problemas Conhecidos]"
+    fallback = (
+        f"{header}\n\n"
+        "Nenhum problema conhecido no momento.\n"
+        "Encontrou algo? Abra uma issue no repositório do KyoPack."
+    )
+    try:
+        issues = gh_request(
+            f"/repos/{repo}/issues?state=open&labels={KNOWN_ISSUES_LABEL}&per_page=100"
+        )
+    except RuntimeError as e:
+        print(f"Aviso: não deu pra consultar issues conhecidas ({e}). Usando texto padrão.")
+        return fallback
+
+    # a API de issues também devolve pull requests; eles não contam aqui.
+    issues = [i for i in issues if "pull_request" not in i]
+    if not issues:
+        return fallback
+
+    lines = [header, ""]
+    lines += [f"- {issue['title']} ({issue['html_url']})" for issue in issues]
+    lines += ["", "Encontrou outro problema? Abra uma issue no repositório do KyoPack."]
+    return "\n".join(lines)
 
 
 def pick_asset(assets: list[dict], pattern: str) -> dict:
@@ -239,7 +262,7 @@ def main() -> int:
             changelog_lines.append(f"- {name} {new}.")
     else:
         changelog_lines.append("- Rebuild forçado, sem mudanças de versão.")
-    changelog_lines += ["", KNOWN_ISSUES]
+    changelog_lines += ["", known_issues_section(SELF_REPO)]
     changelog = "\n".join(changelog_lines)
 
     changelog_path = DIST_DIR / "CHANGELOG_latest.md"
