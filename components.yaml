@@ -1,4 +1,4 @@
-# ForjaNX — mapa de componentes
+# KyoPack — mapa de componentes
 #
 # Cada entrada descreve UMA fonte upstream (um repositório do GitHub) e como o
 # asset da release mais recente deve ser posicionado dentro do pacote final.

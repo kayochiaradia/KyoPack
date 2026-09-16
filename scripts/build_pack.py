@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ForjaNX build script.
+KyoPack build script.
 
 Consulta a release mais recente de cada componente listado em
 components.yaml, baixa e posiciona os arquivos numa pasta build/, monta um
@@ -43,12 +43,12 @@ BUILD_DIR = ROOT / "build"
 DIST_DIR = ROOT / "dist"
 
 GITHUB_API = "https://api.github.com"
-PACK_NAME = "ForjaNX"
+PACK_NAME = "KyoPack"
 
 KNOWN_ISSUES = (
     "[Problemas Conhecidos]\n\n"
     "Nenhum problema conhecido no momento.\n"
-    "Encontrou algo? Abra uma issue no repositório do ForjaNX."
+    "Encontrou algo? Abra uma issue no repositório do KyoPack."
 )
 
 

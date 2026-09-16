@@ -54,6 +54,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.build.outputs.pack_version }}
-          name: "ForjaNX ${{ steps.build.outputs.pack_version }}"
+          name: "KyoPack ${{ steps.build.outputs.pack_version }}"
           body_path: ${{ steps.build.outputs.changelog_path }}
           files: ${{ steps.build.outputs.zip_path }}

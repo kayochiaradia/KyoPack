@@ -1,8 +1,8 @@
-# ForjaNX
+# KyoPack
 
-**ForjaNX** é um forjador automático de pacotes de custom firmware para
+**KyoPack** é um forjador automático de pacotes de custom firmware para
 Nintendo Switch. Em vez de empacotar tudo manualmente toda vez que um
-componente lança uma versão nova, o ForjaNX consulta as *releases* oficiais
+componente lança uma versão nova, o KyoPack consulta as *releases* oficiais
 de cada projeto upstream (Atmosphère, hekate, e o que você adicionar em
 [`components.yaml`](./components.yaml)), monta a estrutura de SD card e
 publica um `.zip` pronto — tudo sozinho, num cron do GitHub Actions.
@@ -13,7 +13,7 @@ publicado. Se algo mudou, sai uma release nova com changelog automático.
 ## Como funciona
 
 ```
-components.yaml  ──►  scripts/build_pack.py  ──►  build/  ──►  dist/ForjaNX-<versão>.zip
+components.yaml  ──►  scripts/build_pack.py  ──►  build/  ──►  dist/KyoPack-<versão>.zip
        │                       │
        │                       └─ compara com state/versions.json
        │                          e só gera pacote se algo mudou
@@ -39,7 +39,7 @@ executa o builder e, se houver atualização:
    [Problemas Conhecidos]
 
    Nenhum problema conhecido no momento.
-   Encontrou algo? Abra uma issue no repositório do ForjaNX.
+   Encontrou algo? Abra uma issue no repositório do KyoPack.
    ```
 
 ## Rodando localmente
@@ -70,7 +70,7 @@ release do `repo` informado, então um slug errado baixa a coisa errada.
 
 ## Aviso legal
 
-O ForjaNX **não contém e não distribui nenhum arquivo de jogo, backup de
+O KyoPack **não contém e não distribui nenhum arquivo de jogo, backup de
 cartucho ou conteúdo protegido por direitos autorais**. Ele apenas
 automatiza o download de *releases públicas* de projetos de código aberto
 que já são distribuídos livremente em seus próprios repositórios.
@@ -89,5 +89,5 @@ afiliado, patrocinado ou endossado pela Nintendo.
 
 O código deste repositório (scripts de build, workflow, configuração) está
 sob licença MIT — veja [`LICENSE`](./LICENSE). Cada componente baixado pelo
-ForjaNX mantém sua própria licença original, definida pelo respectivo
+KyoPack mantém sua própria licença original, definida pelo respectivo
 projeto upstream.
