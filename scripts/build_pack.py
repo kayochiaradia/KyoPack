@@ -101,6 +101,19 @@ def place_copy_to(data: bytes, dest_root: Path, sub: str, filename: str) -> None
     (target / filename).write_bytes(data)
 
 
+def place_asset(asset_spec: dict, asset: dict, data: bytes, build_dir: Path) -> None:
+    place = asset_spec["place"]
+    if place == "zip-merge":
+        place_zip_merge(data, build_dir)
+    elif place == "zip-to":
+        place_zip_to(data, build_dir, asset_spec["dest"])
+    elif place == "copy-to":
+        filename = asset_spec.get("rename", asset["name"])
+        place_copy_to(data, build_dir, asset_spec["dest"], filename)
+    else:
+        raise RuntimeError(f"'place' desconhecido: {place}")
+
+
 def load_yaml(path: Path) -> dict:
     with path.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -158,21 +171,13 @@ def main() -> int:
         release = gh_request(f"/repos/{repo}/releases/latest")
         tag = release["tag_name"]
         version = tag[1:] if comp.get("strip_v") and tag.lower().startswith("v") else tag
+        print(f"    versão: {version}")
 
-        asset = pick_asset(release["assets"], comp["asset_regex"])
-        print(f"    versão: {version}  asset: {asset['name']}")
-
-        data = download(asset["browser_download_url"])
-
-        place = comp["place"]
-        if place == "zip-merge":
-            place_zip_merge(data, BUILD_DIR)
-        elif place == "zip-to":
-            place_zip_to(data, BUILD_DIR, comp["dest"])
-        elif place == "copy-to":
-            place_copy_to(data, BUILD_DIR, comp["dest"], asset["name"])
-        else:
-            raise RuntimeError(f"'place' desconhecido para {name}: {place}")
+        for asset_spec in comp["assets"]:
+            asset = pick_asset(release["assets"], asset_spec["regex"])
+            print(f"    asset: {asset['name']} -> {asset_spec['place']}")
+            data = download(asset["browser_download_url"])
+            place_asset(asset_spec, asset, data, BUILD_DIR)
 
         if old_versions.get(name) != version:
             updates.append((name, old_versions.get(name, "novo"), version))

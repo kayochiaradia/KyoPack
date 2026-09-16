@@ -43,11 +43,15 @@ jobs:
       - name: Commit do estado de versões
         if: steps.build.outputs.updated == 'true'
         run: |
-          git config user.name "forjanx-bot"
+          git config user.name "kyopack-bot"
           git config user.email "actions@users.noreply.github.com"
           git add state/versions.json
-          git commit -m "chore: atualiza versões do pacote (${{ steps.build.outputs.pack_version }})"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: atualiza versões do pacote (${{ steps.build.outputs.pack_version }})"
+            git push
+          else
+            echo "Nenhuma mudança de versão para commitar."
+          fi
 
       - name: Criar release
         if: steps.build.outputs.updated == 'true'

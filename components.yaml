@@ -1,33 +1,168 @@
 # KyoPack — mapa de componentes
 #
-# Cada entrada descreve UMA fonte upstream (um repositório do GitHub) e como o
-# asset da release mais recente deve ser posicionado dentro do pacote final.
+# Cada entrada descreve UMA fonte upstream (um repositório do GitHub). Uma
+# release pode publicar mais de um arquivo útil (ex: um .nro e um .ovl
+# separados) — por isso cada componente tem uma lista de "assets".
 #
-# Campos:
-#   name          nome de exibição (usado no changelog)
-#   repo          "owner/repo" no GitHub
-#   asset_regex   regex (Python re.search) para escolher o asset certo entre
-#                 vários publicados na mesma release
-#   place         como colocar o arquivo baixado no pacote:
-#                   zip-merge   -> extrai o zip direto na raiz do build/
-#                   zip-to      -> extrai o zip dentro de build/<dest>
-#                   copy-to     -> copia o arquivo (sem extrair) para build/<dest>
-#   dest          caminho de destino dentro do build/ (usado por zip-to e copy-to)
-#   strip_v       remove um "v" inicial da tag antes de guardar a versão (bool)
+# Campos do componente:
+#   name        nome de exibição (usado no changelog)
+#   repo        "owner/repo" no GitHub
+#   strip_v     remove um "v" inicial da tag antes de guardar a versão (bool)
+#   assets      lista de arquivos a extrair dessa mesma release
+#
+# Campos de cada asset:
+#   regex     regex (Python re.search) para escolher o asset certo entre
+#             vários publicados na mesma release
+#   place     como colocar o arquivo baixado no pacote:
+#               zip-merge   -> extrai o zip direto na raiz do build/
+#               zip-to      -> extrai o zip dentro de build/<dest>
+#               copy-to     -> copia o arquivo (sem extrair) para build/<dest>
+#   dest      caminho de destino dentro do build/ (usado por zip-to e copy-to)
+#   rename    (opcional, só copy-to) nome fixo do arquivo no destino, pra não
+#             mudar a cada release versionada (ex: "battery_desync_fix_v1.5.1.nro"
+#             vira sempre "battery_desync_fix.nro")
 #
 # Para adicionar um novo componente: confirme o slug real do repositório no
-# GitHub (não adivinhe) e o nome do asset na aba Releases antes de escrever
-# o asset_regex.
+# GitHub e o(s) nome(s) de asset na aba Releases antes de escrever o regex —
+# não adivinhe, um slug errado baixa a coisa errada.
 
 components:
   - name: Atmosphère
     repo: Atmosphere-NX/Atmosphere
-    asset_regex: '^atmosphere-.*\.zip$'
-    place: zip-merge
     strip_v: false
+    assets:
+      # já vem com hbl/hbmenu, daybreak.nro, haze.nro e reboot_to_payload.nro
+      - regex: '^atmosphere-.*\.zip$'
+        place: zip-merge
 
   - name: hekate
     repo: CTCaer/hekate
-    asset_regex: '^hekate_ctcaer_[\d.]+_Nyx_[\d.]+\.zip$'
-    place: zip-merge
     strip_v: true
+    assets:
+      - regex: '^hekate_ctcaer_[\d.]+_Nyx_[\d.]+\.zip$'
+        place: zip-merge
+
+  - name: Fizeau
+    repo: averne/Fizeau
+    strip_v: true
+    assets:
+      - regex: '^Fizeau-.*\.zip$'
+        place: zip-merge
+
+  - name: sys-clk
+    repo: retronx-team/sys-clk
+    strip_v: false
+    assets:
+      - regex: '^sys-clk-.*\.zip$'
+        place: zip-merge
+
+  - name: sys-con
+    repo: cathery/sys-con
+    strip_v: true
+    assets:
+      - regex: '^sys-con-.*\.zip$'
+        place: zip-merge
+
+  - name: SysDVR
+    repo: exelix11/SysDVR
+    strip_v: true
+    assets:
+      - regex: '^SysDVR\.zip$'
+        place: zip-merge
+
+  - name: Ultrahand Overlay
+    repo: ppkantorski/Ultrahand-Overlay
+    strip_v: true
+    assets:
+      - regex: '^sdout\.zip$'
+        place: zip-merge
+
+  - name: battery_desync_fix
+    repo: CTCaer/battery_desync_fix_nx
+    strip_v: false
+    assets:
+      - regex: '^battery_desync_fix.*\.nro$'
+        place: copy-to
+        dest: switch
+        rename: battery_desync_fix.nro
+
+  - name: JKSV
+    repo: J-D-K/JKSV
+    strip_v: false
+    assets:
+      - regex: '^JKSV\.nro$'
+        place: copy-to
+        dest: switch/JKSV
+
+  - name: NX-Activity-Log
+    repo: tallbl0nde/NX-Activity-Log
+    strip_v: true
+    assets:
+      - regex: '^NX-Activity-Log\.nro$'
+        place: copy-to
+        dest: switch/NX-Activity-Log
+
+  - name: Moonlight-Switch
+    repo: XITRIX/Moonlight-Switch
+    strip_v: true
+    assets:
+      - regex: '^Moonlight-Switch\.nro$'
+        place: copy-to
+        dest: switch/Moonlight-Switch
+
+  - name: EdiZon
+    repo: WerWolv/EdiZon
+    strip_v: true
+    assets:
+      - regex: '^EdiZon\.nro$'
+        place: copy-to
+        dest: switch/EdiZon
+      - regex: '^ovlEdiZon\.ovl$'
+        place: copy-to
+        dest: switch/.overlays
+        rename: EdiZon.ovl
+
+  - name: Linkalho
+    repo: impeeza/linkalho
+    strip_v: true
+    assets:
+      - regex: '^linkalho-.*\.zip$'
+        place: zip-merge
+
+  - name: AmiiboGenerator
+    repo: Slluxx/AmiiboGenerator
+    strip_v: true
+    assets:
+      - regex: '^AmiiboGenerator\.nro$'
+        place: copy-to
+        dest: switch/AmiiboGenerator
+
+  - name: HekateToolbox
+    repo: WerWolv/Hekate-Toolbox
+    strip_v: true
+    assets:
+      - regex: '^HekateToolbox\.nro$'
+        place: copy-to
+        dest: switch/HekateToolbox
+
+  - name: SwitchPoff
+    repo: Storm21CH/SwitchPoff-ShutdownSwitch
+    strip_v: false
+    assets:
+      - regex: '^SwitchPoff\..*\.zip$'
+        place: zip-merge
+
+  - name: NX-Region-Manager
+    repo: CostelaCNX/NX-Region-Manager
+    strip_v: false
+    assets:
+      - regex: '^nx-region-manager\.zip$'
+        place: zip-merge
+
+# Deliberadamente FORA da lista: instaladores de título/NSP-XCI (DBI, Tinfoil,
+# LiteFoil, NPShop, Sphaira). Na pesquisa feita pra montar esse arquivo, os
+# projetos e forks mais associados a esses nomes giram majoritariamente em
+# torno de instalar dumps de jogos baixados (catálogos Tinfoil, coleções de
+# ROM, integração com torrent/Telegram) — não é o uso que esse pacote quer
+# habilitar. O CFW e os homebrews acima seguem cobrindo saves, cheats,
+# overclock, streaming, controles e temas sem entrar nessa categoria.
