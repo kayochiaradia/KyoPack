@@ -1,6 +1,6 @@
 {
   "AmiiboGenerator": "2.1.1",
-  "Atmosphère": "1.11.2",
+  "Atmosphère": "1.12.0",
   "Chiaki (Akira)": "0.6.3",
   "DBI": "912ru",
   "EdiZon": "3.1.0",
@@ -18,7 +18,7 @@
   "SysDVR": "6.3",
   "Ultrahand Overlay": "2.5.3",
   "battery_desync_fix": "1.5.1",
-  "hekate": "6.5.3",
+  "hekate": "6.5.4",
   "sys-clk": "2.0.1",
   "sys-con": "0.6.5"
 }
